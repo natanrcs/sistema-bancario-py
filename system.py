@@ -1,66 +1,63 @@
-saldo = 0
-limite_saque = 500
-extrato = []
-numero_saques = 0
-LIMITE_SAQUES = 3
-def depositar(valor):
-    global saldo
-    if valor > 0:
-        saldo += valor
-        extrato.append(f"Depósito: R${valor:.2f}")
-        print("Depósito realizado com sucesso!")
-    else:
-        print("Valor inválido!")
+class Account:
+    def __init__(self, account_owner: str, account_number: str, bank_name: str, agency: str):
+        self.account_owner = account_owner
+        self.account_number = account_number
+        self.bank_name = bank_name
+        self.agency = agency
+        self.balance = 0.0
+        self.extract = []
 
-def sacar(valor):
-    global saldo, numero_saques
+    def deposit(self, value: float):
+        if value <= 0:
+            return "Deposit declined."
+        else:
+            self.balance += value
+            data = {"type": "deposit","value": value}
+            self.extract.append(data)
+            return f"Deposit completed. current balance: {self.balance}"
 
-    if valor > saldo:
-        print("Saldo insuficiente.")
-    elif valor > limite_saque:
-        print("Valor excede o limite por saque.")
-    elif numero_saques >= LIMITE_SAQUES:
-        print("Limite diário de saques atingido.")
-    elif valor > 0:
-        saldo -= valor
-        extrato.append(f"Saque: R${valor:.2f}")
-        numero_saques += 1
-        print("Saque realizado com sucesso!")
-    else:
-        print("Valor inválido.")
+    def withdraw(self, value: float):
+        if value <= 0:
+            return "Withdrawal denied."
+        elif value > self.balance:
+            return "insufficient funds."
+        else:
+            self.balance -= value
+            data = {"type": "withdrawal","value": value}
+            self.extract.append(data)
+            return f"withdrawal completed. current balance: {self.balance}"
 
-def mostrar_extrato():
-    print("----:::EXTRATO:::----")
-    if not extrato:
-        print("Nenhuma movimentação.")
-    else:
-        for mov in extrato:
-            print(mov)
+    def view_transactions(self) -> list[dict]:
+        return self.extract
 
-    print(f"Saldo atual: r$:{saldo:.2f}")
-    print("----::Extrato:::----")
-while True:
-    print("1 - Depositar")
-    print("2 - Sacar")
-    print("3 - Extrato")
-    print("4 - Sair")
+def menu():
+    print("1- deposit")
+    print("2- withdraw")
+    print("3- view transactions")
+    print("4- log out")
+    print("--------------------")
 
-    opcao = int(input("Insira um numero:"))
+def main():
+    account = Account("Natan","0001-00","Nubanks","385 California")
 
-    if opcao == 1:
-        valor = float(input("Valor do depósito: "))
-        depositar(valor)
+    while True:
+        menu()
+        option = input("Enter an option: ")
+        if option == "1":
+            value = float(input("enter a value: "))
+            print(account.deposit(value))
+        elif option == "2":
+            value = float(input("enter a value: "))
+            print(account.withdraw(value))
+        elif option == "3":
+            print(account.view_transactions())
+        elif option == "4":
+            msg = "goodbye, log out...!"
+            print(msg)
+            break
+        else:
+            warning = "try again."
+            print(warning)
 
-    elif opcao == 2:
-        valor = float(input("Valor do saque: "))
-        sacar(valor)
-
-    elif opcao == 3:
-        mostrar_extrato()
-
-    elif opcao == 4:
-        print("Encerrando sistema bancário...")
-        break
-
-    else:
-        print("Opção inválida.")
+if __name__ == "__main__":
+    main()
